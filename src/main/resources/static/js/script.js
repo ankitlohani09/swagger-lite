@@ -39,6 +39,7 @@ $(function () {
         if (tab === 'history') renderHistory();
         if (tab === 'favorites') renderFavorites();
     }
+
     $('#endpointsTab').click(() => toggleTab('endpoints'));
     $('#historyTab').click(() => toggleTab('history'));
     $('#favoritesTab').click(() => toggleTab('favorites'));
@@ -61,7 +62,7 @@ $(function () {
             })
             .fail(() => {
                 $endpoints.html('<div class="text-center py-4 text-muted">No endpoints found</div>');
-                $('#errorMsg').removeClass('d-none').text('Failed to fetch endpoints.');
+                $('#errorMsg').removeClass('d-none').text('Failed to fetch endpoints. Please make sure your service is up and running.');
                 $('#endpointsFilter').addClass('d-none');
             });
     });
@@ -141,7 +142,7 @@ $(function () {
                     .removeClass('d-none')
                     .html(`Status: ${xhr.status} | Time: ${time}ms`);
                 $responseOutput.text(JSON.stringify(data, null, 2));
-                history.unshift({ id: Date.now(), method, url, response: data });
+                history.unshift({id: Date.now(), method, url, response: data});
                 if (history.length > 50) history.pop();
                 localStorage.setItem('requestHistory', JSON.stringify(history));
             },
