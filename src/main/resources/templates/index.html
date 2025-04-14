@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Swagger Lite - Developer Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+    <link href="/css/styles.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Sidebar -->
+    <div id="sidebar">
+        <div class="sidebar-header">
+            <h3>Swagger Lite</h3>
+        </div>
+        <ul class="nav flex-column w-100">
+            <li class="nav-item">
+                <a class="nav-link active" href="#" id="endpointsTab">
+                    <i class="fas fa-cogs"></i> Endpoints
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" id="historyTab">
+                    <i class="fas fa-history"></i> History
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" id="favoritesTab">
+                    <i class="fas fa-star"></i> Favorites
+                </a>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <button class="btn btn-toggle" id="darkToggle">
+                <i class="fas fa-moon"></i> <span>Dark Mode</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="content">
+        <div class="content-header">
+            <div class="breadcrumb" id="currentSection">Endpoints</div>
+            <div class="actions">
+                <button class="btn btn-sm btn-outline-primary" id="helpBtn">
+                    <i class="fas fa-question-circle"></i> Help
+                </button>
+            </div>
+        </div>
+
+        <!-- Endpoints Section -->
+        <div class="content-section fade-in" id="endpointsSection">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-cogs"></i> API Endpoints
+                </div>
+                <div class="card-body">
+                    <form class="mb-3" id="urlForm">
+                        <div class="input-group">
+                            <input class="form-control" id="baseUrl"
+                                   placeholder="Enter Base URL (e.g., http://localhost:8080)" type="text"/>
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-search"></i> Fetch
+                            </button>
+                        </div>
+                        <div class="form-text">Enter your API base URL to discover available endpoints</div>
+                    </form>
+
+                    <div class="endpoints-container">
+                        <div class="endpoints-filter mb-3 d-none" id="endpointsFilter">
+                            <input class="form-control" id="endpointSearch" placeholder="Filter endpoints..."
+                                   type="text">
+                        </div>
+                        <div class="endpoints-list" id="endpoints"></div>
+                    </div>
+
+                    <div class="alert alert-danger d-none" id="errorMsg"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Request Form -->
+        <div class="content-section fade-in d-none" id="requestForm">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-paper-plane"></i> Request</span>
+                        <button class="btn btn-sm btn-outline-secondary" id="backToEndpoints">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info d-none" id="paramDetails"></div>
+                    <form id="requestSender">
+                        <div class="mb-3">
+                            <label class="form-label" for="url">URL</label>
+                            <input class="form-control" id="url" placeholder="Request URL" type="text"/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="method">Method</label>
+                            <select class="form-select" id="method">
+                                <option value="GET">GET</option>
+                                <option value="POST">POST</option>
+                                <option value="PUT">PUT</option>
+                                <option value="DELETE">DELETE</option>
+                                <option value="PATCH">PATCH</option>
+                            </select>
+                        </div>
+
+                        <div class="accordion mb-3" id="requestAccordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" data-bs-target="#headersCollapse" data-bs-toggle="collapse"
+                                            type="button">
+                                        Headers
+                                    </button>
+                                </h2>
+                                <div class="accordion-collapse collapse" data-bs-parent="#requestAccordion"
+                                     id="headersCollapse">
+                                    <div class="accordion-body">
+                                        <textarea class="form-control" id="headers"
+                                                  placeholder='{"Content-Type": "application/json"}'
+                                                  rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" data-bs-target="#bodyCollapse" data-bs-toggle="collapse"
+                                            type="button">
+                                        Request Body
+                                    </button>
+                                </h2>
+                                <div class="accordion-collapse collapse" data-bs-parent="#requestAccordion"
+                                     id="bodyCollapse">
+                                    <div class="accordion-body">
+                                        <textarea class="form-control" id="body" placeholder='{"key": "value"}'
+                                                  rows="5"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" data-bs-target="#fileCollapse" data-bs-toggle="collapse"
+                                            type="button">
+                                        File Upload
+                                    </button>
+                                </h2>
+                                <div class="accordion-collapse collapse" data-bs-parent="#requestAccordion"
+                                     id="fileCollapse">
+                                    <div class="accordion-body">
+                                        <input class="form-control" id="fileUpload" type="file"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-success" type="submit">
+                                <i class="fas fa-paper-plane"></i> Send Request
+                            </button>
+                            <button class="btn btn-outline-primary" id="saveAsFavorite" type="button">
+                                <i class="far fa-star"></i> Save as Favorite
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Response Section -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-reply"></i> Response</span>
+                        <div class="response-actions">
+                            <button class="btn btn-sm btn-outline-secondary" id="copyResponse">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="clearResponse">
+                                <i class="fas fa-trash"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="response-meta d-none" id="responseMeta">
+                        <div class="d-flex justify-content-between mb-2">
+                            <div class="response-status">
+                                <span class="badge bg-success" id="statusCode">200</span>
+                                <span id="statusText">OK</span>
+                            </div>
+                            <div class="response-time">
+                                <i class="fas fa-clock"></i> <span id="responseTime">0</span> ms
+                            </div>
+                        </div>
+                    </div>
+                    <pre class="response-content" id="responseOutput">No response yet</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div class="content-section fade-in d-none" id="historySection">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-history"></i> Request History</span>
+                        <button class="btn btn-sm btn-outline-danger" id="clearHistory">
+                            <i class="fas fa-trash"></i> Clear History
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="list-group" id="historyList">
+                        <div class="text-center text-muted py-5">No history yet</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Favorites Section -->
+        <div class="content-section fade-in d-none" id="favoritesSection">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-star"></i> Favorite Requests</span>
+                        <button class="btn btn-sm btn-outline-danger" id="clearFavorites">
+                            <i class="fas fa-trash"></i> Clear Favorites
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="list-group" id="favoritesList">
+                        <div class="text-center text-muted py-5">No favorites yet</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Startup Message -->
+<div aria-hidden="true" aria-labelledby="startupModalLabel" class="modal fade" id="startupModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="startupModalLabel">
+                    <i class="fas fa-rocket"></i> Welcome to Swagger Lite
+                </h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <p>To use Swagger Lite with your Spring Boot project, add the following dependency:</p>
+                <pre class="code-block">&lt;dependency&gt;
+    &lt;groupId&gt;org.springdoc&lt;/groupId&gt;
+    &lt;artifactId&gt;springdoc-openapi-starter-webmvc-ui&lt;/artifactId&gt;
+    &lt;version&gt;2.5.0&lt;/version&gt;
+&lt;/dependency&gt;</pre>
+                <p class="mt-3">After adding this dependency, your API documentation will be available at:</p>
+                <ul>
+                    <li><code>http://your-server/swagger-ui.html</code> - Swagger UI</li>
+                    <li><code>http://your-server/v3/api-docs</code> - OpenAPI JSON</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Don't show again</button>
+                <button class="btn btn-primary" data-bs-dismiss="modal" type="button">Got It</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Help -->
+<div aria-hidden="true" aria-labelledby="helpModalLabel" class="modal fade" id="helpModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="helpModalLabel">
+                    <i class="fas fa-question-circle"></i> Swagger Lite Help
+                </h5>
+                <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+            </div>
+            <div class="modal-body">
+                <div class="accordion" id="helpAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" data-bs-target="#helpBasics" data-bs-toggle="collapse"
+                                    type="button">
+                                Getting Started
+                            </button>
+                        </h2>
+                        <div class="accordion-collapse collapse show" data-bs-parent="#helpAccordion" id="helpBasics">
+                            <div class="accordion-body">
+                                <p>Swagger Lite is a lightweight API testing tool that helps you discover and test
+                                    endpoints in your Spring Boot applications.</p>
+                                <ol>
+                                    <li>Enter your API base URL (e.g., <code>http://localhost:8080</code>)</li>
+                                    <li>Click "Fetch" to discover available endpoints</li>
+                                    <li>Click on any endpoint to create a request</li>
+                                    <li>Configure your request parameters and body as needed</li>
+                                    <li>Click "Send Request" to execute the API call</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" data-bs-target="#helpFeatures" data-bs-toggle="collapse"
+                                    type="button">
+                                Features
+                            </button>
+                        </h2>
+                        <div class="accordion-collapse collapse" data-bs-parent="#helpAccordion" id="helpFeatures">
+                            <div class="accordion-body">
+                                <ul>
+                                    <li>
+                                    <li><strong>Endpoint Discovery</strong> - Automatically discover API endpoints from
+                                        your Spring Boot application
+                                    </li>
+                                    <li><strong>Request History</strong> - Keep track of your previous API calls</li>
+                                    <li><strong>Favorites</strong> - Save frequently used requests for quick access</li>
+                                    <li><strong>Dark Mode</strong> - Toggle between light and dark themes</li>
+                                    <li><strong>Response Formatting</strong> - Automatically formats JSON responses for
+                                        readability
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" data-bs-target="#helpTips" data-bs-toggle="collapse"
+                                    type="button">
+                                Tips & Tricks
+                            </button>
+                        </h2>
+                        <div class="accordion-collapse collapse" data-bs-parent="#helpAccordion" id="helpTips">
+                            <div class="accordion-body">
+                                <ul>
+                                    <li>Use the filter box to quickly find specific endpoints</li>
+                                    <li>Headers should be provided in JSON format: <code>{"Content-Type":
+                                        "application/json"}</code></li>
+                                    <li>Click "Save as Favorite" to keep frequently used requests</li>
+                                    <li>The response section shows status code, response time, and formatted output</li>
+                                    <li>Your history and favorites are saved locally in your browser</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-bs-dismiss="modal" type="button">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/script.js"></script>
+</body>
+</html>
