@@ -18,6 +18,7 @@ It automatically fetches API documentation from the `/v3/api-docs` endpoint and 
 
 To enable API documentation in your Spring Boot project, add the following Maven dependency:
 
+```xml
 <dependency>
     <groupId>org.springdoc</groupId>
     <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
