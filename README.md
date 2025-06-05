@@ -22,5 +22,5 @@ To enable API documentation in your Spring Boot project, add the following Maven
 <dependency>
     <groupId>org.springdoc</groupId>
     <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-    <version>2.5.0</version>
+    <version>2.7.0</version>
 </dependency>
